@@ -9,15 +9,15 @@ import mqtt from "mqtt";
 
 // ─── Tabela de estatísticas ───────────────────────────────────────────────────
 const stats = {
-  "estufa/temp/ambiente":   { nome: "Temp Ambiente", qos: 0, recebidas: 0, duplicadas: 0, ultimoTs: null },
-  "estufa/agua/nivel":      { nome: "Nível Água",    qos: 1, recebidas: 0, duplicadas: 0, ultimoTs: null },
-  "estufa/alerta/incendio": { nome: "Incêndio",      qos: 2, recebidas: 0, duplicadas: 0, ultimoTs: null },
+  "estufa/temp/ambiente": { nome: "Temp Ambiente", qos: 0, recebidas: 0, duplicadas: 0, ultimoTs: null },
+  "estufa/agua/nivel": { nome: "Nível Água", qos: 1, recebidas: 0, duplicadas: 0, ultimoTs: null },
+  "estufa/alerta/incendio": { nome: "Incêndio", qos: 2, recebidas: 0, duplicadas: 0, ultimoTs: null },
 };
 
 // Rastreia timestamps para detectar duplicatas (mesma ts = duplicata QoS 1)
 const seenTs = {
-  "estufa/temp/ambiente":   new Set(),
-  "estufa/agua/nivel":      new Set(),
+  "estufa/temp/ambiente": new Set(),
+  "estufa/agua/nivel": new Set(),
   "estufa/alerta/incendio": new Set(),
 };
 
@@ -34,8 +34,8 @@ client.on("connect", () => {
   console.log("╚══════════════════════════════════════════════╝\n");
 
   // Assina cada tópico com o QoS correspondente
-  client.subscribe("estufa/temp/ambiente",   { qos: 0 });
-  client.subscribe("estufa/agua/nivel",      { qos: 1 });
+  client.subscribe("estufa/temp/ambiente", { qos: 0 });
+  client.subscribe("estufa/agua/nivel", { qos: 1 });
   client.subscribe("estufa/alerta/incendio", { qos: 2 });
 
   console.log("Assinando tópicos:\n");
@@ -82,28 +82,28 @@ client.on("message", (topic, rawMsg) => {
 
 // ─── Relatório comparativo periódico ─────────────────────────────────────────
 function printRelatorio() {
-  console.log("\n╔════════════════════════════════════════════════════════════════╗");
-  console.log("║            RELATÓRIO COMPARATIVO — MENSAGENS                   ║");
-  console.log("╠══════════════════╦═════╦══════════╦═══════════╦════════════╣");
-  console.log("║ Sensor           ║ QoS ║ Recebidas║ Duplicadas║ Observação ║");
-  console.log("╠══════════════════╬═════╬══════════╬═══════════╬════════════╣");
+  console.log("\n╔══════════════════════════════════════════════════════════════╗");
+  console.log("║            RELATÓRIO COMPARATIVO — MENSAGENS                 ║");
+  console.log("╠═════════════════╦═════╦═══════════╦════════════╦═════════════╣");
+  console.log("║ Sensor          ║ QoS ║ Recebidas ║ Duplicadas ║ Observação  ║");
+  console.log("╠═════════════════╬═════╬═══════════╬════════════╬═════════════╣");
 
   for (const [, s] of Object.entries(stats)) {
-    const nome = s.nome.padEnd(16);
-    const qos  = String(s.qos).padStart(3);
-    const rec  = String(s.recebidas).padStart(8);
-    const dup  = String(s.duplicadas).padStart(9);
-    const obs  = s.qos === 0 ? "Pode perder" :
-                 s.qos === 1 ? "≥1 entrega " :
-                               "Exato 1x   ";
+    const nome = s.nome.padEnd(15);
+    const qos = String(s.qos).padStart(3);
+    const rec = String(s.recebidas).padStart(9);
+    const dup = String(s.duplicadas).padStart(10);
+    const obs = s.qos === 0 ? "Pode perder" :
+      s.qos === 1 ? "≥1 entrega " :
+        "Exato 1x   ";
     console.log(`║ ${nome} ║ ${qos} ║ ${rec} ║ ${dup} ║ ${obs} ║`);
   }
 
-  console.log("╚══════════════════╩═════╩══════════╩═══════════╩════════════╝\n");
+  console.log("╚═════════════════╩═════╩═══════════╩════════════╩═════════════╝\n");
 }
 
 setInterval(printRelatorio, 60000);
 
-client.on("offline",   () => console.warn("\n[MONITOR] ⚡ Offline — broker desconectado"));
+client.on("offline", () => console.warn("\n[MONITOR] ⚡ Offline — broker desconectado"));
 client.on("reconnect", () => console.log("[MONITOR] 🔄 Reconectando ao broker..."));
-client.on("error",     (e) => console.error("[MONITOR] Erro:", e.message));
+client.on("error", (e) => console.error("[MONITOR] Erro:", e.message));

@@ -64,11 +64,10 @@ mqtt-qos-js-main/
 │   └── resultados_stress.md        # Tabela comparativa pós-teste
 │
 ├── docker-compose.yml              # Sobe o broker Mosquitto
+├── package-lock.json
 ├── package.json
 └── README.md
 ```
-
-> **Nota:** Os arquivos `pubQos0.js`, `pubQos1.js`, `pubQos2.js`, `subQos0.js`, etc. são os exemplos originais da aula — mantidos para referência.
 
 ---
 

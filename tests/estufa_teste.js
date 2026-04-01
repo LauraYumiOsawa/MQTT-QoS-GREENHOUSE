@@ -15,11 +15,11 @@
 import mqtt from "mqtt";
 
 // ─── Utilitários ──────────────────────────────────────────────────────────────
-const GREEN  = "\x1b[32m";
-const RED    = "\x1b[31m";
+const GREEN = "\x1b[32m";
+const RED = "\x1b[31m";
 const YELLOW = "\x1b[33m";
-const CYAN   = "\x1b[36m";
-const RESET  = "\x1b[0m";
+const CYAN = "\x1b[36m";
+const RESET = "\x1b[0m";
 
 let passCount = 0;
 let failCount = 0;
@@ -39,11 +39,11 @@ function section(title) {
 }
 
 // ─── Configuração ─────────────────────────────────────────────────────────────
-const BROKER   = "mqtt://localhost:1883";
-const TIMEOUT  = 5000; // ms aguardando cada mensagem
+const BROKER = "mqtt://localhost:1883";
+const TIMEOUT = 5000; // ms aguardando cada mensagem
 const TOPICOS = {
-  temp:     "estufa/temp/ambiente",
-  agua:     "estufa/agua/nivel",
+  temp: "estufa/temp/ambiente",
+  agua: "estufa/agua/nivel",
   incendio: "estufa/alerta/incendio",
 };
 
@@ -62,13 +62,13 @@ function criarSub(clientId) {
 /** Publica e aguarda o subscriber receber — retorna { received, payload, duplicate } */
 function testeEntrega(qos, topico, msgExtra = {}) {
   return new Promise((resolve) => {
-    const ts      = new Date().toISOString();
-    const pub     = criarPub();
-    const sub     = criarSub(`test_sub_${qos}_${Date.now()}`);
-    let   timer   = null;
-    let   received = false;
-    let   duplicateCount = 0;
-    const seenTs  = new Set();
+    const ts = new Date().toISOString();
+    const pub = criarPub();
+    const sub = criarSub(`test_sub_${qos}_${Date.now()}`);
+    let timer = null;
+    let received = false;
+    let duplicateCount = 0;
+    const seenTs = new Set();
 
     sub.on("connect", () => {
       sub.subscribe(topico, { qos }, () => {
@@ -116,7 +116,7 @@ async function testeConexao() {
   section("Teste 1 — Conexão com o Broker");
   return new Promise((resolve) => {
     const client = mqtt.connect(BROKER, { clientId: `test_conn_${Date.now()}`, clean: true, reconnectPeriod: 0 });
-    const timer  = setTimeout(() => {
+    const timer = setTimeout(() => {
       fail(`Não foi possível conectar em ${BROKER} (timeout ${TIMEOUT} ms)`);
       client.end(true);
       resolve(false);
@@ -140,8 +140,8 @@ async function testeConexao() {
 
 async function testeQos0() {
   section("Teste 2 — Sensor Temperatura (QoS 0 · estufa/temp/ambiente)");
-  const msg  = { sensor: "Temperatura Ambiente", valor: 25.0, unidade: "°C", qos: 0 };
-  const res  = await testeEntrega(0, TOPICOS.temp, msg);
+  const msg = { sensor: "Temperatura Ambiente", valor: 25.0, unidade: "°C", qos: 0 };
+  const res = await testeEntrega(0, TOPICOS.temp, msg);
 
   if (res.received) {
     pass("Mensagem QoS 0 entregue");
@@ -151,9 +151,9 @@ async function testeQos0() {
 
   // Valida payload
   if (res.data) {
-    res.data.sensor   ? pass("Campo 'sensor' presente") : fail("Campo 'sensor' ausente");
+    res.data.sensor ? pass("Campo 'sensor' presente") : fail("Campo 'sensor' ausente");
     res.data.valor !== undefined ? pass("Campo 'valor' presente") : fail("Campo 'valor' ausente");
-    res.data.ts       ? pass("Campo 'ts' (timestamp) presente") : fail("Campo 'ts' ausente");
+    res.data.ts ? pass("Campo 'ts' (timestamp) presente") : fail("Campo 'ts' ausente");
     res.data.qos === 0 ? pass("QoS informado no payload é 0") : fail(`QoS no payload incorreto: ${res.data.qos}`);
   }
 }
@@ -186,8 +186,8 @@ async function testeQos2() {
   res.received ? pass("Mensagem QoS 2 entregue (exactly-once garantido)") : fail("Mensagem QoS 2 NÃO recebida");
 
   if (res.data) {
-    res.data.sensor  ? pass("Campo 'sensor' presente") : fail("Campo 'sensor' ausente");
-    res.data.alerta  ? pass("Campo 'alerta' presente") : fail("Campo 'alerta' ausente");
+    res.data.sensor ? pass("Campo 'sensor' presente") : fail("Campo 'sensor' ausente");
+    res.data.alerta ? pass("Campo 'alerta' presente") : fail("Campo 'alerta' ausente");
     res.data.qos === 2 ? pass("QoS informado no payload é 2") : fail(`QoS no payload incorreto: ${res.data.qos}`);
   }
 
@@ -201,8 +201,8 @@ async function testeQos2() {
 async function testePubSubSimetrico() {
   section("Teste 5 — Pub/Sub Simétrico (todos os tópicos juntos)");
   const resultados = await Promise.all([
-    testeEntrega(0, TOPICOS.temp,     { sensor: "temp"     }),
-    testeEntrega(1, TOPICOS.agua,     { sensor: "agua"     }),
+    testeEntrega(0, TOPICOS.temp, { sensor: "temp" }),
+    testeEntrega(1, TOPICOS.agua, { sensor: "agua" }),
     testeEntrega(2, TOPICOS.incendio, { sensor: "incendio" }),
   ]);
 
@@ -236,7 +236,7 @@ async function main() {
   // ─── Resumo ───────────────────────────────────────────────────────────────
   const total = passCount + failCount;
   console.log("\n╔══════════════════════════════════════════════════╗");
-  console.log(`║  RESULTADO FINAL: ${String(passCount).padStart(2)} PASS  ${String(failCount).padStart(2)} FAIL  de ${total} verificações${" ".repeat(Math.max(0,10-String(total).length))}║`);
+  console.log(`║  RESULTADO FINAL: ${String(passCount).padStart(2)} PASS  ${String(failCount).padStart(2)} FAIL  de ${total} verificações${" ".repeat(Math.max(0, 10 - String(total).length))}║`);
   console.log("╚══════════════════════════════════════════════════╝\n");
 
   if (failCount === 0) {
