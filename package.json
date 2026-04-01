@@ -1,0 +1,6 @@
+{
+  "name": "mqtt-qos-aula",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": { "mqtt": "^5.0.0" }
+}
