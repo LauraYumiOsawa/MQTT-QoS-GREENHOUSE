@@ -21,8 +21,8 @@ import mqtt from "mqtt";
 
 // ─── Estatísticas de envio ───────────────────────────────────────────────────
 const stats = {
-  temp:    { enviadas: 0 },
-  agua:    { enviadas: 0 },
+  temp: { enviadas: 0 },
+  agua: { enviadas: 0 },
   incendio: { enviadas: 0 },
 };
 
@@ -49,6 +49,7 @@ client.on("connect", () => {
       qos: 0,
       ts: new Date().toISOString(),
     });
+    // PUBLISH: envio da mensagem; os ACKs do QoS ficam a cargo do mqtt.js.
     client.publish("estufa/temp/ambiente", payload, { qos: 0 }, () => {
       stats.temp.enviadas++;
       console.log(`[QoS 0][TEMP   ] Enviada #${stats.temp.enviadas}: ${temp} °C`);
@@ -65,6 +66,7 @@ client.on("connect", () => {
       qos: 1,
       ts: new Date().toISOString(),
     });
+    // PUBLISH: envio da mensagem; o PUBACK de QoS 1 é tratado internamente.
     client.publish("estufa/agua/nivel", payload, { qos: 1 }, () => {
       stats.agua.enviadas++;
       console.log(`[QoS 1][ÁGUA   ] Enviada #${stats.agua.enviadas}: ${nivel} %`);
@@ -81,6 +83,7 @@ client.on("connect", () => {
         qos: 2,
         ts: new Date().toISOString(),
       });
+      // PUBLISH: envio da mensagem; PUBREC/PUBREL/PUBCOMP são internos ao mqtt.js.
       client.publish("estufa/alerta/incendio", payload, { qos: 2 }, () => {
         stats.incendio.enviadas++;
         console.log(`[QoS 2][INCÊNDIO] ⚠ ALERTA ENVIADO #${stats.incendio.enviadas}`);

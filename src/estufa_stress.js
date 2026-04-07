@@ -46,6 +46,7 @@ publisher.on("connect", () => {
   setInterval(() => {
     const ts = new Date().toISOString();
     const payload = JSON.stringify({ sensor: "temp", valor: +(20 + Math.random() * 15).toFixed(1), ts });
+    // PUBLISH: envio da mensagem; os ACKs do QoS ficam a cargo do mqtt.js.
     publisher.publish("estufa/temp/ambiente", payload, { qos: 0 }, () => {
       pub.temp++;
       process.stdout.write(`[PUB][QoS0] temp #${pub.temp}\r`);
@@ -56,6 +57,7 @@ publisher.on("connect", () => {
   setInterval(() => {
     const ts = new Date().toISOString();
     const payload = JSON.stringify({ sensor: "agua", valor: +(30 + Math.random() * 70).toFixed(1), ts });
+    // PUBLISH: envio da mensagem; o PUBACK de QoS 1 é tratado internamente.
     publisher.publish("estufa/agua/nivel", payload, { qos: 1 }, () => {
       pub.agua++;
       console.log(`[PUB][QoS1] água #${pub.agua}`);
@@ -66,6 +68,7 @@ publisher.on("connect", () => {
   setInterval(() => {
     const ts = new Date().toISOString();
     const payload = JSON.stringify({ sensor: "incendio", alerta: "FUMAÇA", ts });
+    // PUBLISH: envio da mensagem; PUBREC/PUBREL/PUBCOMP são internos ao mqtt.js.
     publisher.publish("estufa/alerta/incendio", payload, { qos: 2 }, () => {
       pub.incendio++;
       console.log(`[PUB][QoS2] incêndio #${pub.incendio}`);

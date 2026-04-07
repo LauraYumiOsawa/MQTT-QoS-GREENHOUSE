@@ -46,6 +46,7 @@ client.on("connect", () => {
 
 // ─── Tratamento de mensagens ──────────────────────────────────────────────────
 client.on("message", (topic, rawMsg) => {
+  // PUBLISH recebido do broker; PUBACK (QoS 1) e PUBREC/PUBREL/PUBCOMP (QoS 2) são internos.
   const s = stats[topic];
   if (!s) return;
 

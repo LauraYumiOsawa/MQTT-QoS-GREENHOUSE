@@ -73,6 +73,7 @@ function testeEntrega(qos, topico, msgExtra = {}) {
     sub.on("connect", () => {
       sub.subscribe(topico, { qos }, () => {
         const payload = JSON.stringify({ _test: true, ts, ...msgExtra });
+        // PUBLISH: envio do teste; o mqtt.js trata PUBACK/PUBREC/PUBREL/PUBCOMP internamente.
         pub.publish(topico, payload, { qos });
 
         timer = setTimeout(() => {
